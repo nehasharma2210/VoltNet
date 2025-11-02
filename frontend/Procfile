@@ -1,0 +1,6 @@
+# Note: Frontend uses Dockerfile with nginx
+# This Procfile is for Nixpacks fallback, but nginx static sites are better handled via Dockerfile
+# To use Dockerfile in Sevalla: Change build settings -> Build type: Dockerfile
+
+web: echo "Please use Dockerfile instead of Nixpacks for nginx-based frontend"
+

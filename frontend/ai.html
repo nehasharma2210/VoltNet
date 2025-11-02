@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltNet - AI Simulation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>VoltNet</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="ai.html" class="active">AI Simulation</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+        <div class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>AI Energy Optimization</h1>
+        
+        <div class="simulation-container">
+            <div class="simulation-card">
+                <div class="simulation-header">
+                    <i class="fas fa-robot"></i>
+                    <h2>Run AI Simulation</h2>
+                    <p>Click the button below to generate optimized energy usage recommendations</p>
+                </div>
+                
+                <div class="simulation-controls">
+                    <button id="runSimulation" class="btn primary">
+                        <i class="fas fa-play"></i> Run AI Prediction
+                    </button>
+                </div>
+                
+                <div id="loading" class="loading-container" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing energy patterns and optimizing...</p>
+                </div>
+                
+                <div id="results" class="results-container" style="display: none;">
+                    <h3>Power Grid Optimization Results</h3>
+                    <div class="result-item">
+                        <i class="fas fa-bolt"></i>
+                        <div>
+                            <h4>Voltage Profile</h4>
+                            <p id="voltageStats">-</p>
+                            <small id="voltageDetails" style="display: block; margin-top: 5px; color: #666;"></small>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <i class="fas fa-exchange-alt"></i>
+                        <div>
+                            <h4>Power Flows</h4>
+                            <p id="flowsStats">-</p>
+                            <small id="flowsDetails" style="display: block; margin-top: 5px; color: #666;"></small>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <h4>Curtailment</h4>
+                            <p id="curtailmentStats">-</p>
+                            <small id="curtailmentDetails" style="display: block; margin-top: 5px; color: #666;"></small>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <i class="fas fa-battery-half"></i>
+                        <div>
+                            <h4>Battery Schedule</h4>
+                            <p id="batteryStats">-</p>
+                            <small id="batteryDetails" style="display: block; margin-top: 5px; color: #666;"></small>
+                        </div>
+                    </div>
+                    <div class="result-item" id="metaInfo" style="display: none;">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <h4>Grid Info</h4>
+                            <p id="metaData">-</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="simulation-params">
+                    <h3>Simulation Parameters</h3>
+                    <div class="param-group">
+                        <label for="renewablePct">Renewable Percentage (%)</label>
+                        <input type="range" id="renewablePct" min="0" max="100" step="1" value="50">
+                        <span id="renewableValue">50%</span>
+                    </div>
+                    
+                    <div class="param-group">
+                        <label for="batterySoc">Battery State of Charge (%)</label>
+                        <input type="range" id="batterySoc" min="0" max="100" step="1" value="50">
+                        <span id="batterySocValue">50%</span>
+                    </div>
+                    
+                    <div class="param-group">
+                        <label for="loadFactor">Load Factor (%)</label>
+                        <input type="range" id="loadFactor" min="0" max="200" step="1" value="100">
+                        <span id="loadFactorValue">100%</span>
+                    </div>
+                    
+                    <div class="param-group">
+                        <label for="baselineIdx">Baseline Index</label>
+                        <input type="number" id="baselineIdx" min="0" value="0" step="1">
+                        <small style="color: #666; display: block; margin-top: 5px;">Index for baseline scenario (default: 0)</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h3>How It Works</h3>
+                <p>Our AI-powered GNN model analyzes power grid parameters to optimize energy distribution:</p>
+                <ul>
+                    <li><i class="fas fa-percentage"></i> <strong>Renewable Percentage:</strong> Percentage of renewable energy in the grid (0-100%)</li>
+                    <li><i class="fas fa-battery-full"></i> <strong>Battery SOC:</strong> Battery State of Charge (0-100%)</li>
+                    <li><i class="fas fa-chart-line"></i> <strong>Load Factor:</strong> Grid load factor (0-200%)</li>
+                    <li><i class="fas fa-list-ol"></i> <strong>Baseline Index:</strong> Select baseline scenario index</li>
+                </ul>
+                <div class="ai-insight">
+                    <i class="fas fa-lightbulb"></i>
+                    <p>The model predicts voltage profiles, power flows, curtailment, and optimal battery scheduling for the power grid.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="volt-footer">
+  <div class="footer-container">
+    
+    <div class="footer-section about">
+      <h4>⚡ About VoltNet</h4>
+      <p>
+        VoltNet is an AI-powered platform that optimizes renewable energy 
+        distribution using smart predictions — making grids cleaner, smarter, and sustainable.
+      </p>
+    </div>
+
+    <div class="footer-section links">
+      <h4>🔗 Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="ai.html">AI Simulation</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section contact">
+      <h4>📞 Contact</h4>
+      <p>Team VoltNet</p>
+      <p>Department of Computer Science and Artificial Intelligence</p>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+        <a href="#"><i class="fas fa-envelope"></i></a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 <span class="brand">VoltNet</span> | Powered by AI/ML Simulation | Designed by Team VoltNet</p>
+  </div>
+</footer>
+
+    <script src="script.js"></script>
+    <script type="module">
+        import { predictOPF, checkBackendHealth } from './api.js';
+        
+        // Check backend health on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const isBackendHealthy = await checkBackendHealth();
+                if (!isBackendHealthy) {
+                    console.warn('Backend is not available.');
+                    showNotification('Backend server is not available. Please start the backend server to run simulations.', 'warning');
+                } else {
+                    showNotification('Connected to backend server! Ready to run simulations.', 'success');
+                }
+            } catch (error) {
+                console.warn('Could not connect to backend:', error);
+                showNotification('Could not connect to backend server. Please start the backend server to run simulations.', 'warning');
+            }
+            
+            // Initialize any UI components
+            initializeSimulation();
+        });
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+        
+        function initializeSimulation() {
+            // Add any initialization code here
+            const runButton = document.getElementById('runSimulation');
+            if (runButton) {
+                runButton.disabled = false;
+            }
+        }
+        // DOM Elements
+        const renewablePct = document.getElementById('renewablePct');
+        const renewableValue = document.getElementById('renewableValue');
+        const batterySoc = document.getElementById('batterySoc');
+        const batterySocValue = document.getElementById('batterySocValue');
+        const loadFactor = document.getElementById('loadFactor');
+        const loadFactorValue = document.getElementById('loadFactorValue');
+        const baselineIdx = document.getElementById('baselineIdx');
+        const runButton = document.getElementById('runSimulation');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        
+        // Save parameters to localStorage
+        function saveParamsToStorage() {
+            const params = {
+                renewable_pct: parseFloat(renewablePct.value) || 50,
+                battery_soc: parseFloat(batterySoc.value) || 50,
+                load_factor: parseFloat(loadFactor.value) || 100,
+                baseline_idx: parseInt(baselineIdx.value) || 0
+            };
+            localStorage.setItem('voltnet_params', JSON.stringify(params));
+        }
+
+        // Load parameters from localStorage
+        function loadParamsFromStorage() {
+            try {
+                const saved = localStorage.getItem('voltnet_params');
+                if (saved) {
+                    const params = JSON.parse(saved);
+                    renewablePct.value = params.renewable_pct !== undefined ? params.renewable_pct : 50;
+                    batterySoc.value = params.battery_soc !== undefined ? params.battery_soc : 50;
+                    loadFactor.value = params.load_factor !== undefined ? params.load_factor : 100;
+                    baselineIdx.value = params.baseline_idx !== undefined ? params.baseline_idx : 0;
+                    return true;
+                }
+            } catch (e) {
+                console.error('Error loading params from storage:', e);
+            }
+            return false;
+        }
+
+        // Listen for storage changes (when parameters change in another tab/page)
+        let isUpdatingFromStorage = false;
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'voltnet_params' && e.newValue) {
+                isUpdatingFromStorage = true;
+                try {
+                    const params = JSON.parse(e.newValue);
+                    renewablePct.value = params.renewable_pct !== undefined ? params.renewable_pct : 50;
+                    batterySoc.value = params.battery_soc !== undefined ? params.battery_soc : 50;
+                    loadFactor.value = params.load_factor !== undefined ? params.load_factor : 100;
+                    baselineIdx.value = params.baseline_idx !== undefined ? params.baseline_idx : 0;
+                    updateRenewableValue();
+                    updateBatterySocValue();
+                    updateLoadFactorValue();
+                } catch (error) {
+                    console.error('Error syncing from storage:', error);
+                } finally {
+                    isUpdatingFromStorage = false;
+                }
+            }
+        });
+
+        // Also listen for custom storage events (for same-tab updates)
+        window.addEventListener('voltnet-params-changed', () => {
+            if (!isUpdatingFromStorage) {
+                isUpdatingFromStorage = true;
+                const saved = localStorage.getItem('voltnet_params');
+                if (saved) {
+                    try {
+                        const params = JSON.parse(saved);
+                        renewablePct.value = params.renewable_pct !== undefined ? params.renewable_pct : 50;
+                        batterySoc.value = params.battery_soc !== undefined ? params.battery_soc : 50;
+                        loadFactor.value = params.load_factor !== undefined ? params.load_factor : 100;
+                        baselineIdx.value = params.baseline_idx !== undefined ? params.baseline_idx : 0;
+                        updateRenewableValue();
+                        updateBatterySocValue();
+                        updateLoadFactorValue();
+                    } catch (error) {
+                        console.error('Error syncing from storage:', error);
+                    }
+                }
+                isUpdatingFromStorage = false;
+            }
+        });
+
+        // Initialize the page
+        function initializePage() {
+            // Load saved parameters from localStorage (shared with Dashboard)
+            loadParamsFromStorage();
+            
+            // Set initial slider values
+            updateRenewableValue();
+            updateBatterySocValue();
+            updateLoadFactorValue();
+            
+            // Add event listeners
+            renewablePct.addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    updateRenewableValue();
+                    saveParamsToStorage();
+                    // Trigger custom event for same-tab sync
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            batterySoc.addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    updateBatterySocValue();
+                    saveParamsToStorage();
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            loadFactor.addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    updateLoadFactorValue();
+                    saveParamsToStorage();
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            baselineIdx.addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    saveParamsToStorage();
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            runButton.addEventListener('click', runSimulation);
+            
+            // Enable the run button
+            runButton.disabled = false;
+        }
+        
+        // Update displayed values
+        function updateRenewableValue() {
+            renewableValue.textContent = renewablePct.value + '%';
+        }
+        
+        function updateBatterySocValue() {
+            batterySocValue.textContent = batterySoc.value + '%';
+        }
+        
+        function updateLoadFactorValue() {
+            loadFactorValue.textContent = loadFactor.value + '%';
+        }
+        
+        // Helper function to calculate statistics from array
+        function calculateStats(arr) {
+            if (!arr || arr.length === 0) return { avg: 0, min: 0, max: 0, count: 0 };
+            const sum = arr.reduce((a, b) => a + b, 0);
+            const avg = sum / arr.length;
+            const min = Math.min(...arr);
+            const max = Math.max(...arr);
+            return { avg, min, max, count: arr.length };
+        }
+        
+        // Format backend response for display
+        function formatResults(data) {
+            const voltage = data.voltage || [];
+            const flows = data.flows || [];
+            const curtailment = data.curtailment_pct || [];
+            const battery = data.battery_schedule || [];
+            const meta = data.meta || {};
+            
+            const vStats = calculateStats(voltage);
+            const fStats = calculateStats(flows);
+            const cStats = calculateStats(curtailment);
+            const bStats = calculateStats(battery);
+            
+            // Format voltage (typically in p.u., target is 1.0)
+            const voltageStatus = vStats.avg >= 0.95 && vStats.avg <= 1.05 ? 'Normal' : 
+                                 vStats.avg < 0.95 ? 'Low' : 'High';
+            
+            return {
+                voltageStats: `Avg: ${vStats.avg.toFixed(3)} p.u. (${voltageStatus})`,
+                voltageDetails: `Range: ${vStats.min.toFixed(3)} - ${vStats.max.toFixed(3)} p.u. | Nodes: ${vStats.count}`,
+                flowsStats: `Avg: ${fStats.avg.toFixed(4)} | Max: ${fStats.max.toFixed(4)}`,
+                flowsDetails: `Min: ${fStats.min.toFixed(4)} | Nodes: ${fStats.count}`,
+                curtailmentStats: `Avg: ${cStats.avg.toFixed(2)}% | Total: ${cStats.sum?.toFixed(2) || (cStats.avg * cStats.count).toFixed(2)}%`,
+                curtailmentDetails: `Range: ${cStats.min.toFixed(2)}% - ${cStats.max.toFixed(2)}% | Nodes: ${cStats.count}`,
+                batteryStats: `Avg: ${bStats.avg.toFixed(3)} | Range: ${bStats.min.toFixed(3)} - ${bStats.max.toFixed(3)}`,
+                batteryDetails: `Positive = Charging, Negative = Discharging | Nodes: ${bStats.count}`,
+                metaData: `Nodes: ${meta.num_nodes || 'N/A'} | Output Dim: ${meta.out_dim || 'N/A'} | Meta Dim: ${meta.meta_out_dim || 'N/A'}`
+            };
+        }
+        
+        // Show error message to user
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            // Remove any existing error messages
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Insert error message before the results
+            results.parentNode.insertBefore(errorDiv, results);
+            
+            // Auto-remove error after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.opacity = '0';
+                setTimeout(() => errorDiv.remove(), 500);
+            }, 5000);
+        }
+        
+        // Handle simulation run
+        async function runSimulation() {
+            // Show loading state
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            runButton.disabled = true;
+            
+            // Get form values - matching backend API requirements
+            const renewable_pct = parseFloat(renewablePct.value);
+            const battery_soc = parseFloat(batterySoc.value);
+            const load_factor = parseFloat(loadFactor.value);
+            const baseline_idx = parseInt(baselineIdx.value) || 0;
+            
+            // Validate inputs according to backend constraints
+            if (isNaN(renewable_pct) || renewable_pct < 0 || renewable_pct > 100) {
+                showError('Renewable percentage must be between 0 and 100');
+                loading.style.display = 'none';
+                runButton.disabled = false;
+                return;
+            }
+            
+            if (isNaN(battery_soc) || battery_soc < 0 || battery_soc > 100) {
+                showError('Battery SOC must be between 0 and 100');
+                loading.style.display = 'none';
+                runButton.disabled = false;
+                return;
+            }
+            
+            if (isNaN(load_factor) || load_factor < 0 || load_factor > 200) {
+                showError('Load factor must be between 0 and 200');
+                loading.style.display = 'none';
+                runButton.disabled = false;
+                return;
+            }
+            
+            if (isNaN(baseline_idx) || baseline_idx < 0) {
+                showError('Baseline index must be a non-negative integer');
+                loading.style.display = 'none';
+                runButton.disabled = false;
+                return;
+            }
+            
+            // Prepare request data exactly as backend expects
+            const requestData = {
+                renewable_pct: renewable_pct,
+                battery_soc: battery_soc,
+                load_factor: load_factor,
+                baseline_idx: baseline_idx
+            };
+            
+            // Save parameters to localStorage before running simulation
+            saveParamsToStorage();
+            
+            console.log('Sending request to backend:', requestData);
+            
+            try {
+                // Call the API - returns real backend data
+                const response = await predictOPF(requestData);
+                console.log('Received backend response:', response);
+                
+                // Format and display real backend results
+                const formattedResults = formatResults(response);
+                
+                document.getElementById('voltageStats').textContent = formattedResults.voltageStats;
+                document.getElementById('voltageDetails').textContent = formattedResults.voltageDetails;
+                document.getElementById('flowsStats').textContent = formattedResults.flowsStats;
+                document.getElementById('flowsDetails').textContent = formattedResults.flowsDetails;
+                document.getElementById('curtailmentStats').textContent = formattedResults.curtailmentStats;
+                document.getElementById('curtailmentDetails').textContent = formattedResults.curtailmentDetails;
+                document.getElementById('batteryStats').textContent = formattedResults.batteryStats;
+                document.getElementById('batteryDetails').textContent = formattedResults.batteryDetails;
+                document.getElementById('metaData').textContent = formattedResults.metaData;
+                
+                // Show meta info if available
+                if (response.meta) {
+                    document.getElementById('metaInfo').style.display = 'block';
+                }
+                
+                // Show success message
+                showNotification('Simulation completed successfully with real backend data!', 'success');
+                
+            } catch (error) {
+                console.error('Error running simulation:', error);
+                showError(`Backend Error: ${error.message || 'Failed to run simulation. Make sure backend is running.'}`);
+            } finally {
+                // Hide loading and show results
+                loading.style.display = 'none';
+                results.style.display = 'block';
+                runButton.disabled = false;
+                
+                // Scroll to results
+                results.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // Initialize the page when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

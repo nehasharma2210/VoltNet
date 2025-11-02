@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltNet - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>VoltNet</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">Dashboard</a></li>
+            <li><a href="ai.html">AI Simulation</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+        <div class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>Energy Dashboard</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                <div class="stat-info">
+                    <h3>Average Voltage</h3>
+                    <p class="stat-value" id="avgVoltage">-<span> p.u.</span></p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-exchange-alt"></i></div>
+                <div class="stat-info">
+                    <h3>Power Flows</h3>
+                    <p class="stat-value" id="avgFlows">-</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-info">
+                    <h3>Curtailment</h3>
+                    <p class="stat-value" id="avgCurtailment">-<span>%</span></p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon teal"><i class="fas fa-battery-half"></i></div>
+                <div class="stat-info">
+                    <h3>Grid Nodes</h3>
+                    <p class="stat-value" id="numNodes">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Voltage Profile</h2>
+            <canvas id="voltageChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Power Flows</h2>
+            <canvas id="flowsChart"></canvas>
+        </div>
+
+        <div class="energy-sources">
+            <h2>Grid Statistics</h2>
+            <div class="sources-grid">
+                <div class="source">
+                    <i class="fas fa-bolt"></i>
+                    <span>Voltage Range</span>
+                    <div class="progress-bar">
+                        <div class="progress" id="voltageProgress" style="width: 0%;"></div>
+                    </div>
+                    <span class="percentage" id="voltageRange">-</span>
+                </div>
+                <div class="source">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Max Flow</span>
+                    <div class="progress-bar">
+                        <div class="progress" id="flowProgress" style="width: 0%;"></div>
+                    </div>
+                    <span class="percentage" id="maxFlow">-</span>
+                </div>
+                <div class="source">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Curtailment</span>
+                    <div class="progress-bar">
+                        <div class="progress" id="curtailmentProgress" style="width: 0%;"></div>
+                    </div>
+                    <span class="percentage" id="totalCurtailment">-</span>
+                </div>
+                <div class="source">
+                    <i class="fas fa-battery-half"></i>
+                    <span>Battery Schedule</span>
+                    <div class="progress-bar">
+                        <div class="progress" id="batteryProgress" style="width: 50%;"></div>
+                    </div>
+                    <span class="percentage" id="batteryAvg">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container" style="margin-top: 2rem;">
+            <h2>Simulation Parameters</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--card-bg, #fff); border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div class="param-group">
+                    <label for="dashRenewablePct" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color, #333);">
+                        <i class="fas fa-percentage"></i> Renewable Percentage (%)
+                    </label>
+                    <input type="range" id="dashRenewablePct" min="0" max="100" step="1" value="40" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: #666;">0%</span>
+                        <span id="dashRenewableValue" style="font-weight: 600; color: var(--primary, #007bff);">40%</span>
+                        <span style="font-size: 0.85rem; color: #666;">100%</span>
+                    </div>
+                </div>
+                
+                <div class="param-group">
+                    <label for="dashBatterySoc" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color, #333);">
+                        <i class="fas fa-battery-full"></i> Battery SOC (%)
+                    </label>
+                    <input type="range" id="dashBatterySoc" min="0" max="100" step="1" value="65" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: #666;">0%</span>
+                        <span id="dashBatterySocValue" style="font-weight: 600; color: var(--primary, #007bff);">65%</span>
+                        <span style="font-size: 0.85rem; color: #666;">100%</span>
+                    </div>
+                </div>
+                
+                <div class="param-group">
+                    <label for="dashLoadFactor" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color, #333);">
+                        <i class="fas fa-chart-line"></i> Load Factor (%)
+                    </label>
+                    <input type="range" id="dashLoadFactor" min="0" max="200" step="1" value="85" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: #666;">0%</span>
+                        <span id="dashLoadFactorValue" style="font-weight: 600; color: var(--primary, #007bff);">85%</span>
+                        <span style="font-size: 0.85rem; color: #666;">200%</span>
+                    </div>
+                </div>
+                
+                <div class="param-group">
+                    <label for="dashBaselineIdx" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-color, #333);">
+                        <i class="fas fa-list-ol"></i> Baseline Index
+                    </label>
+                    <input type="number" id="dashBaselineIdx" min="0" value="1" step="1" style="width: 100%; padding: 0.5rem; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem;">
+                    <small style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.85rem;">Index for baseline scenario</small>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 2rem 0;">
+            <button id="refreshDashboard" class="btn primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                <i class="fas fa-sync-alt"></i> Update Dashboard with New Parameters
+            </button>
+        </div>
+    </main>
+    <footer class="volt-footer">
+  <div class="footer-container">
+    
+    <div class="footer-section about">
+      <h4>⚡ About VoltNet</h4>
+      <p>
+        VoltNet is an AI-powered platform that optimizes renewable energy 
+        distribution using smart predictions — making grids cleaner, smarter, and sustainable.
+      </p>
+    </div>
+
+    <div class="footer-section links">
+      <h4>🔗 Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="ai.html">AI Simulation</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section contact">
+      <h4>📞 Contact</h4>
+      <p>Team VoltNet</p>
+      <p>Department of Computer Science and Artificial Intelligence</p>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+        <a href="#"><i class="fas fa-envelope"></i></a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 <span class="brand">VoltNet</span> | Powered by AI/ML Simulation | Designed by Team VoltNet</p>
+  </div>
+</footer>
+
+    <script src="script.js"></script>
+    <script type="module">
+        import { predictOPF, checkBackendHealth } from './api.js';
+
+        let voltageChart = null;
+        let flowsChart = null;
+
+        // Initialize charts
+        function initCharts() {
+            const voltageCtx = document.getElementById('voltageChart').getContext('2d');
+            voltageChart = new Chart(voltageCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Voltage (p.u.)',
+                        data: [],
+                        borderColor: '#FF6B6B',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Voltage (p.u.)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Node Index' }
+                        }
+                    }
+                }
+            });
+
+            const flowsCtx = document.getElementById('flowsChart').getContext('2d');
+            flowsChart = new Chart(flowsCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Power Flow',
+                        data: [],
+                        borderColor: '#4ECDC4',
+                        backgroundColor: 'rgba(78, 205, 196, 0.6)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Flow Magnitude' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Node Index' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Get current input values
+        function getCurrentParams() {
+            return {
+                renewable_pct: parseFloat(document.getElementById('dashRenewablePct').value) || 40,
+                battery_soc: parseFloat(document.getElementById('dashBatterySoc').value) || 65,
+                load_factor: parseFloat(document.getElementById('dashLoadFactor').value) || 85,
+                baseline_idx: parseInt(document.getElementById('dashBaselineIdx').value) || 1
+            };
+        }
+
+        // Update dashboard with backend data
+        async function updateDashboard() {
+            try {
+                // Check backend health first
+                const isHealthy = await checkBackendHealth();
+                if (!isHealthy) {
+                    throw new Error('Backend server is not available');
+                }
+
+                // Get parameters from input controls
+                const params = getCurrentParams();
+
+                console.log('Fetching data with parameters:', params);
+
+                // Fetch real backend data with current input values
+                const response = await predictOPF(params);
+                
+                // Update stats cards
+                updateStats(response);
+                
+                // Update charts
+                updateCharts(response);
+                
+                // Update progress bars
+                updateProgressBars(response);
+                
+                console.log('Dashboard updated with backend data:', response);
+                
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+                // Show error state
+                document.querySelectorAll('.stat-value').forEach(el => {
+                    el.textContent = 'Error';
+                });
+            }
+        }
+
+        // Update stats cards
+        function updateStats(data) {
+            const voltage = data.voltage || [];
+            const flows = data.flows || [];
+            const curtailment = data.curtailment_pct || [];
+            const meta = data.meta || {};
+
+            // Calculate averages
+            const avgVoltage = voltage.length > 0 
+                ? (voltage.reduce((a, b) => a + b, 0) / voltage.length).toFixed(3)
+                : '-';
+            
+            const avgFlow = flows.length > 0
+                ? (flows.reduce((a, b) => a + b, 0) / flows.length).toFixed(4)
+                : '-';
+            
+            const avgCurtailment = curtailment.length > 0
+                ? (curtailment.reduce((a, b) => a + b, 0) / curtailment.length).toFixed(2)
+                : '-';
+
+            // Update DOM
+            document.getElementById('avgVoltage').innerHTML = avgVoltage + '<span> p.u.</span>';
+            document.getElementById('avgFlows').textContent = avgFlow;
+            document.getElementById('avgCurtailment').innerHTML = avgCurtailment + '<span>%</span>';
+            document.getElementById('numNodes').textContent = meta.num_nodes || '-';
+        }
+
+        // Update charts with real data
+        function updateCharts(data) {
+            const voltage = data.voltage || [];
+            const flows = data.flows || [];
+
+            // Create node labels
+            const nodeLabels = voltage.map((_, i) => `Node ${i + 1}`);
+
+            // Update voltage chart
+            if (voltageChart) {
+                voltageChart.data.labels = nodeLabels;
+                voltageChart.data.datasets[0].data = voltage;
+                voltageChart.update();
+            }
+
+            // Update flows chart
+            if (flowsChart) {
+                flowsChart.data.labels = nodeLabels;
+                flowsChart.data.datasets[0].data = flows;
+                flowsChart.update();
+            }
+        }
+
+        // Update progress bars
+        function updateProgressBars(data) {
+            const voltage = data.voltage || [];
+            const flows = data.flows || [];
+            const curtailment = data.curtailment_pct || [];
+            const battery = data.battery_schedule || [];
+
+            // Voltage range (normalize to 0-100% for display)
+            if (voltage.length > 0) {
+                const minV = Math.min(...voltage);
+                const maxV = Math.max(...voltage);
+                const range = maxV - minV;
+                const voltagePercent = Math.min(100, (range / 0.2) * 100); // Assuming 0.2 p.u. is max range
+                document.getElementById('voltageProgress').style.width = voltagePercent + '%';
+                document.getElementById('voltageRange').textContent = `${minV.toFixed(3)} - ${maxV.toFixed(3)} p.u.`;
+            }
+
+            // Max flow
+            if (flows.length > 0) {
+                const maxFlow = Math.max(...flows);
+                const flowPercent = Math.min(100, (maxFlow / Math.max(maxFlow, 0.1)) * 100);
+                document.getElementById('flowProgress').style.width = flowPercent + '%';
+                document.getElementById('maxFlow').textContent = maxFlow.toFixed(4);
+            }
+
+            // Total curtailment
+            if (curtailment.length > 0) {
+                const totalCurtail = curtailment.reduce((a, b) => a + b, 0);
+                const curtailPercent = Math.min(100, totalCurtail / 10); // Assuming 10% total is max
+                document.getElementById('curtailmentProgress').style.width = curtailPercent + '%';
+                document.getElementById('totalCurtailment').textContent = totalCurtail.toFixed(2) + '%';
+            }
+
+            // Battery average
+            if (battery.length > 0) {
+                const avgBattery = battery.reduce((a, b) => a + b, 0) / battery.length;
+                const batteryPercent = ((avgBattery + 1) / 2) * 100; // Normalize from [-1, 1] to [0, 100]
+                document.getElementById('batteryProgress').style.width = batteryPercent + '%';
+                document.getElementById('batteryAvg').textContent = avgBattery.toFixed(3);
+            }
+        }
+
+        // Save parameters to localStorage
+        function saveParamsToStorage() {
+            const params = getCurrentParams();
+            localStorage.setItem('voltnet_params', JSON.stringify({
+                renewable_pct: params.renewable_pct,
+                battery_soc: params.battery_soc,
+                load_factor: params.load_factor,
+                baseline_idx: params.baseline_idx
+            }));
+        }
+
+        // Load parameters from localStorage
+        function loadParamsFromStorage() {
+            try {
+                const saved = localStorage.getItem('voltnet_params');
+                if (saved) {
+                    const params = JSON.parse(saved);
+                    document.getElementById('dashRenewablePct').value = params.renewable_pct || 40;
+                    document.getElementById('dashBatterySoc').value = params.battery_soc || 65;
+                    document.getElementById('dashLoadFactor').value = params.load_factor || 85;
+                    document.getElementById('dashBaselineIdx').value = params.baseline_idx !== undefined ? params.baseline_idx : 1;
+                    return true;
+                }
+            } catch (e) {
+                console.error('Error loading params from storage:', e);
+            }
+            return false;
+        }
+
+        // Update input value displays
+        function updateInputDisplays() {
+            document.getElementById('dashRenewableValue').textContent = document.getElementById('dashRenewablePct').value + '%';
+            document.getElementById('dashBatterySocValue').textContent = document.getElementById('dashBatterySoc').value + '%';
+            document.getElementById('dashLoadFactorValue').textContent = document.getElementById('dashLoadFactor').value + '%';
+            // Save to localStorage whenever values change
+            saveParamsToStorage();
+        }
+
+        // Listen for storage changes (when parameters change in another tab/page)
+        let isUpdatingFromStorage = false;
+        window.addEventListener('storage', async (e) => {
+            if (e.key === 'voltnet_params' && e.newValue) {
+                isUpdatingFromStorage = true;
+                try {
+                    const params = JSON.parse(e.newValue);
+                    document.getElementById('dashRenewablePct').value = params.renewable_pct || 40;
+                    document.getElementById('dashBatterySoc').value = params.battery_soc || 65;
+                    document.getElementById('dashLoadFactor').value = params.load_factor || 85;
+                    document.getElementById('dashBaselineIdx').value = params.baseline_idx !== undefined ? params.baseline_idx : 1;
+                    updateInputDisplays();
+                    // Auto-update dashboard with new parameters
+                    await updateDashboard();
+                } catch (error) {
+                    console.error('Error syncing from storage:', error);
+                } finally {
+                    isUpdatingFromStorage = false;
+                }
+            }
+        });
+
+        // Also listen for custom storage events (for same-tab updates)
+        window.addEventListener('voltnet-params-changed', async () => {
+            if (!isUpdatingFromStorage) {
+                isUpdatingFromStorage = true;
+                const saved = localStorage.getItem('voltnet_params');
+                if (saved) {
+                    try {
+                        const params = JSON.parse(saved);
+                        document.getElementById('dashRenewablePct').value = params.renewable_pct || 40;
+                        document.getElementById('dashBatterySoc').value = params.battery_soc || 65;
+                        document.getElementById('dashLoadFactor').value = params.load_factor || 85;
+                        document.getElementById('dashBaselineIdx').value = params.baseline_idx !== undefined ? params.baseline_idx : 1;
+                        updateInputDisplays();
+                        // Auto-update dashboard with new parameters
+                        await updateDashboard();
+                    } catch (error) {
+                        console.error('Error syncing from storage:', error);
+                    }
+                }
+                isUpdatingFromStorage = false;
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            initCharts();
+            
+            // Load saved parameters from localStorage (if available)
+            loadParamsFromStorage();
+            
+            // Initialize input displays
+            updateInputDisplays();
+            
+            // Add event listeners to sliders for real-time value updates
+            document.getElementById('dashRenewablePct').addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    updateInputDisplays();
+                    // Trigger custom event for same-tab sync
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            document.getElementById('dashBatterySoc').addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    updateInputDisplays();
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            document.getElementById('dashLoadFactor').addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    updateInputDisplays();
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            document.getElementById('dashBaselineIdx').addEventListener('input', () => {
+                if (!isUpdatingFromStorage) {
+                    saveParamsToStorage();
+                    window.dispatchEvent(new Event('voltnet-params-changed'));
+                }
+            });
+            
+            // Load initial data
+            await updateDashboard();
+        });
+
+        // Refresh button - update dashboard with new parameters
+        document.getElementById('refreshDashboard').addEventListener('click', async () => {
+            const btn = document.getElementById('refreshDashboard');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            
+            try {
+                // Save current parameters before updating
+                saveParamsToStorage();
+                await updateDashboard();
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Update Dashboard with New Parameters';
+            }
+        });
+    </script>
+</body>
+</html>

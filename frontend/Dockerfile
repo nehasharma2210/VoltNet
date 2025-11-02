@@ -15,7 +15,7 @@ COPY config.js.template /usr/share/nginx/html/config.js.template
 
 # Create startup script to inject BACKEND_URL environment variable
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
-    echo 'export BACKEND_URL=${BACKEND_URL:-http://localhost:8000}' >> /docker-entrypoint.sh && \
+    echo 'export BACKEND_URL=${BACKEND_URL:-https://voltnet.onrender.com}' >> /docker-entrypoint.sh && \
     echo 'envsubst < /usr/share/nginx/html/config.js.template > /usr/share/nginx/html/config.js' >> /docker-entrypoint.sh && \
     echo 'exec nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
     chmod +x /docker-entrypoint.sh

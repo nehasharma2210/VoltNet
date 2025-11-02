@@ -1,7 +1,7 @@
 // API configuration
 function inferDefaultBackend() {
     try {
-        return `${window.location.protocol}//${window.location.hostname}:8000`;
+       return  'https://voltnet.onrender.com';
     } catch (_) {
         return 'https://voltnet.onrender.com';
     }

@@ -2,15 +2,26 @@ version: "3.8"
 services:
   backend:
     build: ./backend
+    container_name: voltnet-backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend/artifacts:/app/artifacts
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
   frontend:
     build: ./frontend
+    container_name: voltnet-frontend
     ports:
       - "8501:8501"
     environment:
-      - BACKEND_URL=http://backend:8000
+      - BACKEND_URL=http://localhost:8000
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

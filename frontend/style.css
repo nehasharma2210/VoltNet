@@ -253,11 +253,83 @@ nav ul li a:hover {
     margin: 2rem 0;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
 }
 
 .chart-container h2 {
     margin-bottom: 1.5rem;
     color: var(--text);
+}
+
+.chart-container canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Chart.js responsive wrapper */
+.chart-container > canvas {
+    position: relative !important;
+}
+
+/* Touch-friendly improvements */
+button,
+.btn,
+.nav-links a,
+.theme-toggle,
+.mobile-menu-toggle {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: var(--primary-dark);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    background: var(--primary-dark);
+}
+
+/* Prevent text selection on buttons for mobile */
+button,
+.btn {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* Energy Sources */
@@ -949,53 +1021,254 @@ nav ul li a:hover {
 }
 
 
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.mobile-menu-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.mobile-menu-toggle i {
+    pointer-events: none;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
     .team-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+    
+    .container {
+        padding: 1.5rem;
+    }
 }
 
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
+@media (max-width: 992px) {
+    .simulation-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
         padding: 1rem;
     }
     
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Mobile Navbar */
+    .navbar {
+        flex-wrap: wrap;
+        padding: 1rem;
+        position: relative;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
     .nav-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
         margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        gap: 0;
+    }
+    
+    .nav-links.active {
+        display: flex;
     }
     
     .nav-links li {
-        margin: 0 0.5rem;
+        margin: 0;
+        width: 100%;
     }
     
+    .nav-links a {
+        display: block;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .theme-toggle {
+        margin-left: auto;
+        margin-right: 0.5rem;
+    }
+    
+    /* Container and spacing */
+    .container {
+        padding: 1rem;
+    }
+    
+    main h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Stats Grid - Single column on very small screens */
     .stats-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin: 1.5rem 0;
     }
     
+    .stat-card {
+        padding: 1.25rem;
+    }
+    
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.25rem;
+        margin-right: 0.75rem;
+    }
+    
+    .stat-value {
+        font-size: 1.25rem;
+    }
+    
+    /* Charts */
+    .chart-container {
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .chart-container h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Energy Sources */
+    .sources-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .energy-sources {
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    /* Team Section */
     .team-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
         gap: 1.5rem;
     }
     
     .team-member {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem;
+        min-height: auto;
     }
     
     .member-avatar {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1rem;
     }
     
     .team-section h2 {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
     
-    .sources-grid {
+    .team-section {
+        padding: 2rem 0;
+        margin: 2rem 0;
+    }
+    
+    /* About Page */
+    .about-hero {
+        padding: 2rem 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .about-hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .tagline {
+        font-size: 1rem;
+    }
+    
+    .about-section {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
     }
     
+    .about-card {
+        padding: 1.5rem;
+    }
+    
+    .tech-section {
+        margin: 2rem 0;
+    }
+    
+    .tech-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    /* Simulation Page */
+    .simulation-card, .info-card {
+        padding: 1.5rem;
+    }
+    
+    .simulation-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .simulation-header i {
+        font-size: 2.5rem;
+    }
+    
+    .param-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .param-group label {
+        font-size: 0.9rem;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Inputs and form elements */
+    .param-group input[type="range"] {
+        padding: 0.5rem 0;
+    }
+    
+    .param-group input[type="number"] {
+        padding: 0.75rem;
+        font-size: 1rem;
+        min-height: 44px; /* Touch-friendly */
+    }
+    
+    /* Timeline */
     .timeline::before {
         left: 31px;
     }
@@ -1019,6 +1292,170 @@ nav ul li a:hover {
     
     .timeline-dot {
         left: 21px !important;
+    }
+    
+    /* Footer */
+    .volt-footer {
+        padding: 30px 0 15px;
+    }
+    
+    .footer-container {
+        flex-direction: column;
+        padding: 0 1rem;
+    }
+    
+    .footer-section {
+        margin: 15px 0;
+        text-align: center;
+    }
+    
+    /* Results container */
+    .results-container {
+        padding: 1rem;
+    }
+    
+    .result-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+    
+    .result-item i {
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+    }
+    
+    /* Chart improvements for mobile */
+    .chart-container canvas {
+        max-height: 300px !important;
+    }
+    
+    /* Simulation parameters grid */
+    .simulation-params {
+        margin-top: 1.5rem;
+    }
+    
+    /* Better spacing for input controls */
+    .param-group span {
+        display: block;
+        margin-top: 0.5rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+    
+    /* Simulation parameters grid */
+    .params-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+        padding: 1.25rem !important;
+    }
+    
+    .param-group {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
+    }
+    
+    .navbar {
+        padding: 0.75rem;
+    }
+    
+    .logo {
+        font-size: 1.25rem;
+    }
+    
+    .logo i {
+        font-size: 1.5rem;
+    }
+    
+    main h1 {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.1rem;
+    }
+    
+    .chart-container {
+        padding: 0.75rem;
+    }
+    
+    .chart-container h2 {
+        font-size: 1.1rem;
+    }
+    
+    .team-member {
+        padding: 1.25rem;
+    }
+    
+    .member-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .about-hero {
+        padding: 1.5rem 0.75rem;
+    }
+    
+    .about-hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .simulation-card, .info-card {
+        padding: 1.25rem;
+    }
+    
+    .btn {
+        padding: 0.875rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Better touch targets */
+    .nav-links a,
+    .theme-toggle,
+    .mobile-menu-toggle {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Notification adjustments */
+    .notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        padding: 12px 20px;
+    }
+    
+    /* Back to top button */
+    #backToTop {
+        bottom: 1rem;
+        right: 1rem;
+        width: 45px;
+        height: 45px;
+    }
+    
+    /* Simulation parameters grid for very small screens */
+    .params-grid {
+        grid-template-columns: 1fr !important;
+        padding: 1rem !important;
+        gap: 1rem !important;
     }
 }
 

@@ -1,11 +1,8 @@
 // API configuration
 function inferDefaultBackend() {
-    try {
-       return  'https://voltnet.onrender.com';
-    } catch (_) {
-        return 'https://voltnet.onrender.com';
-    }
+    return 'https://voltnet.onrender.com';  // ✅ Force your Render backend
 }
+
 
 function getConfiguredBackendUrl() {
     try {

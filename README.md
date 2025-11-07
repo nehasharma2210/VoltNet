@@ -59,7 +59,7 @@ VoltNet enables:
 
 ## System Design
 
-# Components
+### Components
 - Frontend (React + Tailwind) – Provides user-friendly dashboard for predictions
 - Backend (FastAPI + PyTorch) – Serves GNN-based inference and handles pre/post-processing
 - Model Artifacts – Trained SurrogateGNN, scalers, and edge/node metadata

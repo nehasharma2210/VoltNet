@@ -2,6 +2,11 @@
 function inferDefaultBackend() {
     return 'https://voltnet.onrender.com';  // ✅ Force your Render backend
 }
+window.addEventListener('load', () => {
+  fetch("https://voltnet.onrender.com")
+    .then(() => console.log("Backend waking up..."))
+    .catch(() => console.log("Backend sleep mode... trying again..."));
+});
 
 
 function getConfiguredBackendUrl() {

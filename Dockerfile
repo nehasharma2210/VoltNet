@@ -1,5 +1,5 @@
 # Multi-stage build for Render deployment
-FROM python:3.10-slim as backend-build
+FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -19,18 +19,14 @@ COPY backend/ ./backend/
 # Copy frontend files
 COPY frontend/ ./frontend/
 
-# Configure nginx for frontend
-COPY frontend/nginx.conf /etc/nginx/sites-available/default
+# Copy and setup nginx config
+COPY frontend/nginx-render.conf /etc/nginx/sites-available/default
+RUN rm -f /etc/nginx/sites-enabled/default && \
+    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-# Start nginx for frontend\n\
-nginx -g "daemon on;"\n\
-\n\
-# Start backend API\n\
-cd /app/backend\n\
-exec python -m uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1\n\
-' > /start.sh && chmod +x /start.sh
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \

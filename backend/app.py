@@ -19,20 +19,38 @@ app.add_middleware(
 
 # Add static file serving to FastAPI
 from fastapi.staticfiles import StaticFiles
+import os
 
 # Root endpoint
 @app.get("/")
 async def root():
     return {"message": "PowerGrid Surrogate API is running!"}
 
-# Mount static files (add this after CORS middleware)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static files only if directory exists
+static_dir = "static"
+if not os.path.exists(static_dir):
+    # Try different paths
+    possible_paths = ["../frontend", "./frontend", "../static"]
+    for path in possible_paths:
+        if os.path.exists(path):
+            static_dir = path
+            break
+    else:
+        # Create empty static directory if none found
+        os.makedirs("static", exist_ok=True)
+        static_dir = "static"
+
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Serve frontend files
 @app.get("/app")
 async def serve_frontend():
     from fastapi.responses import FileResponse
-    return FileResponse("static/index.html")
+    frontend_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(frontend_file):
+        return FileResponse(frontend_file)
+    else:
+        return {"message": "Frontend not available", "api_docs": "/docs"}
 
 class PredictRequest(BaseModel):
     renewable_pct: float = Field(..., ge=0.0, le=100.0)

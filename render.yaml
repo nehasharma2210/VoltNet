@@ -1,11 +1,10 @@
 services:
-  # Backend-only Docker service (Simplified)
+  # Backend-only Python service (Simplified)
   - type: web
     name: voltnet-backend
-    env: docker
-    dockerfilePath: ./Dockerfile
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && python -m uvicorn app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PORT
         value: 10000
-      - key: PYTHONPATH
-        value: /app

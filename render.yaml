@@ -1,25 +1,21 @@
 services:
-  # Backend API Service
+  # Full-stack Docker service (Backend + Frontend)
   - type: web
-    name: voltnet-backend
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python -m uvicorn app:app --host 0.0.0.0 --port $PORT
+    name: voltnet-fullstack
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: PORT
         value: 10000
-      - key: PYTHON_VERSION
-        value: "3.10"
-    rootDir: backend
-    
-  # Frontend Static Site
-  - type: static
-    name: voltnet-frontend
-    buildCommand: |
-      # Replace backend URL in config
-      sed -i 's|${BACKEND_URL}|https://voltnet-backend.onrender.com|g' config.js
-    staticPublishPath: .
-    rootDir: frontend
-    envVars:
       - key: BACKEND_URL
-        value: https://voltnet-backend.onrender.com
+        value: http://localhost:10000
+        
+  # Alternative: Backend-only Docker service
+  # - type: web
+  #   name: voltnet-backend-docker
+  #   env: docker
+  #   dockerfilePath: ./Dockerfile.render
+  #   rootDir: .
+  #   envVars:
+  #     - key: PORT
+  #       value: 10000

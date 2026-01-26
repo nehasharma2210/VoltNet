@@ -19,12 +19,21 @@ app.add_middleware(
 
 # Add static file serving to FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import os
 
 # Root endpoint
 @app.get("/")
 async def root():
-    return {"message": "PowerGrid Surrogate API is running!"}
+    return {
+        "message": "PowerGrid Surrogate API is running!",
+        "frontend": "/app",
+        "endpoints": {
+            "health": "/health",
+            "predict": "/predict_opf",
+            "docs": "/docs"
+        }
+    }
 
 # Mount static files only if directory exists
 static_dir = "static"
@@ -45,12 +54,20 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 # Serve frontend files
 @app.get("/app")
 async def serve_frontend():
-    from fastapi.responses import FileResponse
     frontend_file = os.path.join(static_dir, "index.html")
     if os.path.exists(frontend_file):
         return FileResponse(frontend_file)
     else:
         return {"message": "Frontend not available", "api_docs": "/docs"}
+
+# Serve other frontend files
+@app.get("/app/{file_path:path}")
+async def serve_frontend_files(file_path: str):
+    file_location = os.path.join(static_dir, file_path)
+    if os.path.exists(file_location) and os.path.isfile(file_location):
+        return FileResponse(file_location)
+    else:
+        return FileResponse(os.path.join(static_dir, "index.html"))
 
 class PredictRequest(BaseModel):
     renewable_pct: float = Field(..., ge=0.0, le=100.0)
@@ -61,12 +78,20 @@ class PredictRequest(BaseModel):
 ART = {}
 ARTIFACT_DIR = os.path.join(os.path.dirname(__file__), "artifacts")
 
+import asyncio
+from keep_alive import keep_alive_loop
+
 @app.on_event("startup")
 def startup_event():
     global ART
     try:
         ART = load_artifacts(artifact_dir=ARTIFACT_DIR, device='cpu', verbose=True)
         print("✅ Artifacts loaded successfully at startup.")
+        
+        # Start keep-alive task
+        asyncio.create_task(keep_alive_loop())
+        print("🔄 Keep-alive service started")
+        
     except Exception as e:
         print("❌ Failed to load artifacts during startup:", str(e))
         traceback.print_exc()

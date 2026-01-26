@@ -8,3 +8,4 @@ pydantic
 streamlit
 h5py
 networkx
+aiohttp

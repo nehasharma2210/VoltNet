@@ -1,3 +1,36 @@
+// Backend Status Check and Loading
+document.addEventListener('DOMContentLoaded', function() {
+    checkBackendStatus();
+});
+
+async function checkBackendStatus() {
+    const statusElement = document.getElementById('backend-status');
+    if (!statusElement) return;
+    
+    statusElement.innerHTML = '🔄 Checking backend status...';
+    statusElement.className = 'backend-status checking';
+    
+    try {
+        const { checkBackendHealth } = await import('./api.js');
+        const isHealthy = await checkBackendHealth();
+        
+        if (isHealthy) {
+            statusElement.innerHTML = '✅ Backend is ready!';
+            statusElement.className = 'backend-status ready';
+        } else {
+            statusElement.innerHTML = '⏳ Backend is starting up... Please wait';
+            statusElement.className = 'backend-status starting';
+            // Retry after 5 seconds
+            setTimeout(checkBackendStatus, 5000);
+        }
+    } catch (error) {
+        statusElement.innerHTML = '❌ Backend connection failed';
+        statusElement.className = 'backend-status error';
+        // Retry after 10 seconds
+        setTimeout(checkBackendStatus, 10000);
+    }
+}
+
 // Mobile Menu Toggle Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');

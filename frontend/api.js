@@ -1,12 +1,36 @@
-// API configuration
+// API configuration with backend wake-up
 function inferDefaultBackend() {
-    return 'https://voltnet.onrender.com';  // ✅ Force your Render backend
+    return 'https://voltnet.onrender.com';  // ✅ Your backend URL
 }
+
+// Wake up backend on page load
 window.addEventListener('load', () => {
-  fetch("https://voltnet.onrender.com")
-    .then(() => console.log("Backend waking up..."))
-    .catch(() => console.log("Backend sleep mode... trying again..."));
+    console.log("🚀 Waking up backend...");
+    wakeUpBackend();
 });
+
+// Function to wake up sleeping backend
+async function wakeUpBackend() {
+    const backendUrl = getConfiguredBackendUrl();
+    try {
+        console.log("📡 Pinging backend:", backendUrl);
+        const response = await fetch(`${backendUrl}/health`, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+            console.log("✅ Backend is awake!");
+            return true;
+        } else {
+            console.log("⏳ Backend waking up... trying again in 5s");
+            setTimeout(wakeUpBackend, 5000);
+        }
+    } catch (error) {
+        console.log("⏳ Backend sleeping... trying again in 5s");
+        setTimeout(wakeUpBackend, 5000);
+    }
+}
 
 
 function getConfiguredBackendUrl() {
@@ -42,32 +66,48 @@ function logApiResponse(endpoint, response, isError = false) {
 }
 
 /**
- * Make a prediction using the backend API
- * @param {Object} data - Prediction request data (renewable_pct, battery_soc, load_factor, baseline_idx)
- * @returns {Promise<Object>} - Backend prediction results with voltage, flows, curtailment_pct, battery_schedule
+ * Make a prediction using the backend API with retry logic
+ * @param {Object} data - Prediction request data
+ * @returns {Promise<Object>} - Backend prediction results
  */
 export async function predictOPF(data) {
     const endpoint = '/predict_opf';
     logApiCall(endpoint, data);
     
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
+    // First try to wake up backend
+    await wakeUpBackend();
+    
+    // Retry logic for prediction
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
 
-    logApiResponse(endpoint, response);
+            logApiResponse(endpoint, response);
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+            
+        } catch (error) {
+            console.log(`Attempt ${attempt} failed:`, error.message);
+            if (attempt < 3) {
+                console.log("⏳ Retrying in 3 seconds...");
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            } else {
+                throw error;
+            }
+        }
     }
-
-    // Return real backend data directly - no transformation, no fallback
-    return await response.json();
 }
 
 /**

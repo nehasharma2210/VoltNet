@@ -1,5 +1,5 @@
 services:
-  # Backend-only Python service (Simplified)
+  # Backend API Service
   - type: web
     name: voltnet-backend
     env: python
@@ -8,3 +8,15 @@ services:
     envVars:
       - key: PORT
         value: 10000
+        
+  # Frontend Static Site
+  - type: static
+    name: voltnet-frontend
+    buildCommand: |
+      # Update config.js with backend URL
+      sed -i 's|http://localhost:8000|https://voltnet-backend.onrender.com|g' frontend/config.js
+      sed -i 's|http://backend:8000|https://voltnet-backend.onrender.com|g' frontend/config.js
+    staticPublishPath: frontend
+    envVars:
+      - key: BACKEND_URL
+        value: https://voltnet-backend.onrender.com

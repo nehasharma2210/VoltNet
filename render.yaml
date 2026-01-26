@@ -1,21 +1,11 @@
 services:
-  # Full-stack Docker service (Backend + Frontend)
+  # Backend-only Docker service (Simplified)
   - type: web
-    name: voltnet-fullstack
+    name: voltnet-backend
     env: docker
     dockerfilePath: ./Dockerfile
     envVars:
       - key: PORT
         value: 10000
-      - key: BACKEND_URL
-        value: http://localhost:10000
-        
-  # Alternative: Backend-only Docker service
-  # - type: web
-  #   name: voltnet-backend-docker
-  #   env: docker
-  #   dockerfilePath: ./Dockerfile.render
-  #   rootDir: .
-  #   envVars:
-  #     - key: PORT
-  #       value: 10000
+      - key: PYTHONPATH
+        value: /app

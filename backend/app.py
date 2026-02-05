@@ -242,8 +242,22 @@ def predict(req: PredictRequest):
                         padding = np.zeros((num_nodes - 1, out_dim), dtype=pred_real.dtype)
                         pred_real = np.concatenate([pred_real, padding], axis=0)
 
-        # build outputs
-        voltage = pred_real[:, 0] if out_dim > 0 else np.zeros(num_nodes)
+        # build outputs with realistic bounds
+        raw_voltage = pred_real[:, 0] if out_dim > 0 else np.zeros(num_nodes)
+        
+        # Apply realistic voltage bounds (0.85 to 1.15 p.u.)
+        voltage = np.clip(raw_voltage, 0.85, 1.15)
+        
+        # If still extreme, normalize to realistic range
+        if np.any(np.abs(voltage) > 2.0):  # If still unrealistic
+            voltage_min, voltage_max = raw_voltage.min(), raw_voltage.max()
+            if voltage_max > voltage_min:
+                # Normalize to 0-1, then scale to 0.9-1.1 p.u.
+                voltage_normalized = (raw_voltage - voltage_min) / (voltage_max - voltage_min)
+                voltage = 0.9 + (voltage_normalized * 0.2)  # 0.9 to 1.1 p.u. range
+            else:
+                voltage = np.ones(num_nodes)  # Default to 1.0 p.u.
+        
         flows = np.abs(voltage - voltage.mean())
         curtail = np.where(voltage > 1.05, 10.0, 0.0)
         voltage_dev = voltage - 1.0

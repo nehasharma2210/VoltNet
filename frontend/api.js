@@ -1,6 +1,6 @@
 // API configuration with backend wake-up
 function inferDefaultBackend() {
-    return 'https://voltnet.onrender.com';  // ✅ Your actual backend URL
+    return 'http://127.0.0.1:8000';  // ✅ Your actual backend URL
 }
 
 // Wake up backend on page load

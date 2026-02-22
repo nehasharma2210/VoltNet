@@ -1,0 +1,4 @@
+pip install torch torch-geometric scikit-learn tqdm
+
+# For .7z extraction (optional)
+pip install py7zr

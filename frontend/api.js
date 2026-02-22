@@ -1,6 +1,10 @@
 // API configuration with backend wake-up
 function inferDefaultBackend() {
-    return 'https://voltnet.onrender.com';  // ✅ Your actual backend URL
+    // Try to get BACKEND_URL from config.js
+    if (typeof BACKEND_URL !== 'undefined') {
+        return BACKEND_URL;
+    }
+    return 'http://localhost:8000';  // Default to localhost
 }
 
 // Wake up backend on page load

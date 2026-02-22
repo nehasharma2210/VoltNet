@@ -130,7 +130,7 @@ def load_artifacts(artifact_dir=None, device='cpu', verbose=True):
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"best_model.pth not found in {artifact_dir}")
 
-        ckpt = torch.load(model_path, map_location=device)
+        ckpt = torch.load(model_path, map_location=device, weights_only=False)
         # normalize to a state_dict
         if isinstance(ckpt, dict) and "model_state_dict" in ckpt:
             state_dict = ckpt["model_state_dict"]

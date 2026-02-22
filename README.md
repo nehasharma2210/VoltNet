@@ -1,43 +1,68 @@
 # VoltNet: AI-Powered Optimal Power Flow Prediction using GNN
 
-> Real-time OPF prediction using Graph Neural Networks for efficient renewable energy integration and smart grid management.
+> Real-time OPF prediction using Graph Neural Networks trained on real IEEE power system datasets
 
 ---
 
-### Live Demo  
-**Frontend:** [https://volt-net.vercel.app](https://volt-net.vercel.app)  
-**Backend API (Docs):** [https://volt-net-api.onrender.com/docs](https://volt-net-api.onrender.com/docs)
-
----
-
-## 🚀 Quick Start with Docker
+## 🚀 Quick Start - Train on Real IEEE Dataset
 
 ### Prerequisites
-- Docker
-- Docker Compose
+- Python 3.8+
+- Virtual environment with dependencies installed
 
-### One-Click Deployment
+### Training (3 Steps)
 
-**Windows:**
-```cmd
-deploy.bat
+#### 1. Ensure Dataset is Extracted
+```
+dataset_pf_opf/
+├── ieee24/
+├── ieee39/  ← Recommended
+├── ieee118/
+└── uk/
 ```
 
-**Linux/Mac:**
+#### 2. Run Training
 ```bash
-chmod +x deploy.sh
-./deploy.sh
+# Windows
+START_TRAINING.bat
+
+# Or manually
+venv\Scripts\activate
+python train_ieee_model.py --bus_system ieee39 --epochs 50
 ```
 
-**Manual:**
+#### 3. Start Application
 ```bash
-docker-compose up --build -d
+cd backend
+python app.py
+# Open http://localhost:8000
 ```
 
-### Access
-- **Frontend**: http://localhost
-- **Backend API**: http://localhost:8000
-- **Health Check**: http://localhost:8000/health
+---
+
+## 📊 Available Datasets
+
+| Dataset | Nodes | Training Time | Recommended |
+|---------|-------|---------------|-------------|
+| IEEE24 | 24 | 10-15 min | Quick test |
+| **IEEE39** | 39 | 20-30 min | **✅ Best choice** |
+| IEEE118 | 118 | 1-2 hours | Advanced |
+| UK | Variable | Variable | Real-world |
+
+---
+
+## 🎯 Training Options
+
+```bash
+# Quick test (10 epochs)
+python train_ieee_model.py --bus_system ieee39 --epochs 10
+
+# Full training (50 epochs)
+python train_ieee_model.py --bus_system ieee39 --epochs 50
+
+# Advanced (IEEE118, 100 epochs)
+python train_ieee_model.py --bus_system ieee118 --epochs 100 --batch_size 16
+```
 
 ---
 

@@ -25,6 +25,7 @@ MANIFEST
 
 # Virtual environments
 venv/
+.venv/
 env/
 ENV/
 env.bak/
@@ -89,3 +90,17 @@ coverage.xml
 # Backup files
 *.bak
 *.backup
+
+# Datasets
+data/
+dataset_cascades/
+dataset_pf_opf/
+
+# Model weights
+models/
+*.pth
+*.pt
+
+# Training logs
+training_history.json
+*.log
